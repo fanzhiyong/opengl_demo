@@ -1,5 +1,2 @@
-*.db
-*.opendb
-Debug
-.vs
 *.user
+build*
