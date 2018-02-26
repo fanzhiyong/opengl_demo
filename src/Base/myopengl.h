@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
@@ -22,14 +21,15 @@ private:
 
     void init();
 
+    QString getShaderSource(const QString & fileName);
+
     bool checkShaderCompileStatus(GLuint id);
 
     bool createShader(GLuint & id, int shaderType, const QString & shaderSource);
 
 private:
 
-    GLuint m_vbo;
-    GLuint m_vao;
+    // do something
 };
 
 #endif // MYOPENGL_H

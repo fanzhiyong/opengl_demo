@@ -1,5 +1,6 @@
 ﻿#include "myopengl.h"
 #include <QDebug>
+#include <QFile>
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
@@ -11,32 +12,13 @@ void MyOpenGL::initializeGL()
     initializeOpenGLFunctions();
 
     GLuint vertexShader, fragmentShader;
-    QString vertexShaderSource =
-            "#version 330 core\n"
-            "layout(location = 0) in vec3 aPos;\n"
-            "out vec4 color;\n"
-            "void main()\n"
-            "{\n"
-            "	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "   color = vec4(0.0, 1.0, 0.0, 1.0);\n"
-            "}\n";
-
-    QString fragmentShaderSource =
-            "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "in vec4 color;\n"
-            "void main()\n"
-            "{\n"
-            "	FragColor = color;\n"
-            "}\n";
-
     // vertex shader
-    if( !createShader(vertexShader, GL_VERTEX_SHADER, vertexShaderSource) )
+    if( !createShader(vertexShader, GL_VERTEX_SHADER, getShaderSource(":/res/vertexShader.txt")) )
     {
         return;
     }
     // fragment shader
-    if( !createShader(fragmentShader, GL_FRAGMENT_SHADER, fragmentShaderSource) )
+    if( !createShader(fragmentShader, GL_FRAGMENT_SHADER, getShaderSource(":/res/fragmentShader.txt")) )
     {
         return;
     }
@@ -59,11 +41,10 @@ void MyOpenGL::initializeGL()
 
 void MyOpenGL::paintGL()
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.168f, 0.211f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // draw
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -73,26 +54,18 @@ void MyOpenGL::resizeGL(int w, int h)
 
 void MyOpenGL::init()
 {
-    // 数据
-    float vertices[] = {
-        // first triangle
-        -0.9f, -0.5f, 0.0f,  // left
-        -0.0f, -0.5f, 0.0f,  // right
-        -0.45f, 0.5f, 0.0f,  // top
-        // second triangle
-        0.0f, -0.5f, 0.0f,  // left
-        0.9f, -0.5f, 0.0f,  // right
-        0.45f, 0.5f, 0.0f   // top
-    };
+    // do something
+}
 
-    glGenVertexArrays(1, &m_vao);
-    glGenBuffers(1, &m_vbo);
+QString MyOpenGL::getShaderSource(const QString &fileName)
+{
+    QFile file(fileName);
+    if( file.open(QIODevice::ReadOnly) )
+    {
+        return file.readAll();
+    }
 
-    glBindVertexArray(m_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    return "";
 }
 
 bool MyOpenGL::checkShaderCompileStatus(GLuint id)

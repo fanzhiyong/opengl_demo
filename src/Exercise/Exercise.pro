@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = HelloWorld
+TARGET = Exercise
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -31,3 +31,6 @@ HEADERS  += widget.h \
     myopengl.h
 
 FORMS    += widget.ui
+
+RESOURCES += \
+    default.qrc
