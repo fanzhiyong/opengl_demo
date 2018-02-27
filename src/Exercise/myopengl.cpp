@@ -1,10 +1,15 @@
 ﻿#include "myopengl.h"
 #include <QDebug>
 #include <QFile>
+#include <QImage>
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
+    m_rValue = 0.0f;
 
+    m_timer = new QTimer(this);
+    m_timer->setInterval(100);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 void MyOpenGL::initializeGL()
@@ -25,15 +30,15 @@ void MyOpenGL::initializeGL()
 
     // program
     // link shader
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    m_shaderProgram = glCreateProgram();
+    glAttachShader(m_shaderProgram, vertexShader);
+    glAttachShader(m_shaderProgram, fragmentShader);
+    glLinkProgram(m_shaderProgram);
     // clear
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     // use
-    glUseProgram(shaderProgram);
+    glUseProgram(m_shaderProgram);
 
     // init
     init();
@@ -44,7 +49,11 @@ void MyOpenGL::paintGL()
     glClearColor(0.0f, 0.168f, 0.211f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // texture
+    glBindTexture(GL_TEXTURE_2D, m_texture);
     // draw
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_QUADS, 0, 4);
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -54,7 +63,45 @@ void MyOpenGL::resizeGL(int w, int h)
 
 void MyOpenGL::init()
 {
-    // do something
+    float vertices[] = {
+        // pos color texture-coord
+        -0.8f, 0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+         0.8f, 0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+         0.8f,  -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -0.8f, -0.8f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f
+    };
+
+    // VAO
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
+    // VBO
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // texture
+    QImage image(":/res/timg.jpg");
+    // convert to RGBA
+    QImage imageRGBA = image.convertToFormat(QImage::Format_RGBA8888);
+
+
+    glGenTextures(1, &m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, imageRGBA.bits());
+    // 参数
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    m_timer->start();
 }
 
 QString MyOpenGL::getShaderSource(const QString &fileName)
@@ -94,4 +141,22 @@ bool MyOpenGL::createShader(GLuint & id, int shaderType, const QString & shaderS
     glCompileShader(id);
 
     return checkShaderCompileStatus(id);
+}
+
+void MyOpenGL::onTimeout()
+{
+//    m_rValue += 0.05f;
+//    if( m_rValue > 1.0f )
+//    {
+//        m_rValue = 0.0f;
+//    }
+
+//    // set uniform
+//    GLint location = glGetUniformLocation(m_shaderProgram, "testColor");
+//    if( location != -1 )
+//    {
+//        glUseProgram(m_shaderProgram);
+//        glUniform4f(location, m_rValue, 0.0f, 0.0f, 1.0f);
+//        update();
+//    }
 }

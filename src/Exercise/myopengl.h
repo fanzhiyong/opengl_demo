@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QTimer>
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -27,9 +28,21 @@ private:
 
     bool createShader(GLuint & id, int shaderType, const QString & shaderSource);
 
+private slots:
+
+    void onTimeout();
+
 private:
 
-    // do something
+    GLuint      m_shaderProgram;
+    GLuint      m_vao;
+    GLuint      m_vbo;
+
+    GLuint      m_texture;
+
+    QTimer    * m_timer;
+
+    float       m_rValue;
 };
 
 #endif // MYOPENGL_H
