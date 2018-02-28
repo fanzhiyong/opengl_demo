@@ -2,13 +2,15 @@
 #include <QDebug>
 #include <QFile>
 #include <QImage>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
     m_rValue = 0.0f;
 
-    m_timer = new QTimer(this);
-    m_timer->setInterval(100);
+    m_timer = new MMTimer(4, this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
@@ -46,14 +48,24 @@ void MyOpenGL::initializeGL()
 
 void MyOpenGL::paintGL()
 {
-    glClearColor(0.0f, 0.168f, 0.211f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // texture
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_texture);
+
     // draw
     glBindVertexArray(m_vao);
     glDrawArrays(GL_QUADS, 0, 4);
+
+//    glUseProgram(m_shaderProgram);
+//    GLint rotateLocation = glGetUniformLocation(m_shaderProgram, "transform");
+//    if( rotateLocation != -1 )
+//    {
+//        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0f,0.0f,1.0f));
+//        glUniformMatrix4fv(rotateLocation, 1, GL_FALSE, &rotationMatrix[0][0]);
+//    }
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -144,6 +156,27 @@ bool MyOpenGL::createShader(GLuint & id, int shaderType, const QString & shaderS
     return checkShaderCompileStatus(id);
 }
 
+void MyOpenGL::transform()
+{
+    static GLfloat angle = 0.0f;
+
+    angle += 0.01f;
+    if( angle > 360.0f )
+    {
+        angle = 0.0f;
+    }
+
+    glUseProgram(m_shaderProgram);
+    GLint rotateLocation = glGetUniformLocation(m_shaderProgram, "transform");
+    if( rotateLocation != -1 )
+    {
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f,0.0f,1.0f));
+        glUniformMatrix4fv(rotateLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+
+        update();
+    }
+}
+
 void MyOpenGL::onTimeout()
 {
 //    m_rValue += 0.05f;
@@ -160,4 +193,6 @@ void MyOpenGL::onTimeout()
 //        glUniform4f(location, m_rValue, 0.0f, 0.0f, 1.0f);
 //        update();
 //    }
+
+    transform();
 }

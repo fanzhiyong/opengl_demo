@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
-#include <QTimer>
+#include "mmtimer.h"
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -28,6 +28,8 @@ private:
 
     bool createShader(GLuint & id, int shaderType, const QString & shaderSource);
 
+    void transform();
+
 private slots:
 
     void onTimeout();
@@ -40,7 +42,7 @@ private:
 
     GLuint      m_texture;
 
-    QTimer    * m_timer;
+    MMTimer   * m_timer;
 
     float       m_rValue;
 };
