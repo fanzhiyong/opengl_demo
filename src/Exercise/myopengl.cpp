@@ -65,42 +65,8 @@ void MyOpenGL::paintGL()
 
     // draw
     glBindVertexArray(m_vao);
-
-    QList<glm::vec3> cubePositions =
-    {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-
     glUseProgram(m_shaderProgram);
-    for( int i = 0; i < cubePositions.size(); i++ )
-    {
-        // model
-        GLint modelLocation = glGetUniformLocation(m_shaderProgram, "model");
-        if( modelLocation != -1 )
-        {
-            glm::mat4 rotationMatrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-            //glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
-        }
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-
-//    glUseProgram(m_shaderProgram);
-//    GLint rotateLocation = glGetUniformLocation(m_shaderProgram, "transform");
-//    if( rotateLocation != -1 )
-//    {
-//        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0f,0.0f,1.0f));
-//        glUniformMatrix4fv(rotateLocation, 1, GL_FALSE, &rotationMatrix[0][0]);
-//    }
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -336,20 +302,24 @@ void MyOpenGL::mouseMoveEvent(QMouseEvent *event)
 
 void MyOpenGL::onTimeout()
 {
-//    m_rValue += 0.05f;
-//    if( m_rValue > 1.0f )
-//    {
-//        m_rValue = 0.0f;
-//    }
 
-//    // set uniform
-//    GLint location = glGetUniformLocation(m_shaderProgram, "testColor");
-//    if( location != -1 )
-//    {
-//        glUseProgram(m_shaderProgram);
-//        glUniform4f(location, m_rValue, 0.0f, 0.0f, 1.0f);
-//        update();
-//    }
+    static float angle = 0.0f;
 
-    //transform();
+    angle += 0.01f;
+    if( angle > 360.0f ) angle = 0.0f;
+
+
+    glUseProgram(m_shaderProgram);
+    GLint viewLocation = glGetUniformLocation(m_shaderProgram, "view");
+    if( viewLocation != -1 )
+    {
+        float radius = 4.0f;
+        float camX = sin(angle) * radius;
+        float camZ = cos(angle) * radius;
+
+        glm::mat4 view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+
+        update();
+    }
 }
