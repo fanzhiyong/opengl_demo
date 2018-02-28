@@ -32,11 +32,21 @@ private:
 
     void coordTransform();
 
+    void mousePressEvent(QMouseEvent * event);
+
+    void mouseReleaseEvent(QMouseEvent * event);
+
+    void mouseMoveEvent(QMouseEvent * event);
+
 private slots:
 
     void onTimeout();
 
 private:
+
+    bool        m_pressed;
+    QPoint      m_pressPoint;
+    float       m_x;
 
     GLuint      m_shaderProgram;
     GLuint      m_vao;

@@ -5,10 +5,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <QMouseEvent>
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
     m_rValue = 0.0f;
+
+    m_x = 0.0f;
+
+    m_pressed = false;
 
     m_timer = new MMTimer(10, this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
@@ -42,6 +47,9 @@ void MyOpenGL::initializeGL()
     // use
     glUseProgram(m_shaderProgram);
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+
     // init
     init();
 }
@@ -49,7 +57,7 @@ void MyOpenGL::initializeGL()
 void MyOpenGL::paintGL()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // texture
     glActiveTexture(GL_TEXTURE0);
@@ -57,7 +65,34 @@ void MyOpenGL::paintGL()
 
     // draw
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_QUADS, 0, 4);
+
+    QList<glm::vec3> cubePositions =
+    {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    glUseProgram(m_shaderProgram);
+    for( int i = 0; i < cubePositions.size(); i++ )
+    {
+        // model
+        GLint modelLocation = glGetUniformLocation(m_shaderProgram, "model");
+        if( modelLocation != -1 )
+        {
+            glm::mat4 rotationMatrix = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+            //glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
+            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+        }
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
 //    glUseProgram(m_shaderProgram);
 //    GLint rotateLocation = glGetUniformLocation(m_shaderProgram, "transform");
@@ -75,12 +110,55 @@ void MyOpenGL::resizeGL(int w, int h)
 
 void MyOpenGL::init()
 {
-    float vertices[] = {
-        // pos color texture-coord
-        -0.8f, 0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-         0.8f, 0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-         0.8f,  -0.8f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -0.8f, -0.8f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f
+    float vertices[] =
+    {
+        // 上
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        // 下
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        // 左
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        // 右
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        // 前
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        // 后
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     // VAO
@@ -92,12 +170,10 @@ void MyOpenGL::init()
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     // texture
     QImage image(":/res/timg.jpg");
@@ -212,6 +288,50 @@ void MyOpenGL::coordTransform()
     }
 
     update();
+}
+
+void MyOpenGL::mousePressEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    m_pressPoint = event->pos();
+    m_pressed    = true;
+}
+
+void MyOpenGL::mouseReleaseEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+
+    QPoint diff = m_pressPoint - event->pos();
+    m_x = (diff.x() / 60.0f) * 360 + m_x;
+
+    m_pressed = false;
+}
+
+void MyOpenGL::mouseMoveEvent(QMouseEvent *event)
+{
+    if( m_pressed )
+    {
+//        QPoint diff = event->pos() - m_pressPoint;
+
+//        float x = (diff.x() / 400.0f) * 360 + m_x;
+//        float y = (diff.y() / 40.0f) * 360;
+//        qInfo()<<x;
+
+//        // 改变模型
+//        glUseProgram(m_shaderProgram);
+
+//        GLint modelLocation = glGetUniformLocation(m_shaderProgram, "model");
+//        if( modelLocation != -1 )
+//        {
+//            // x
+//            glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(x), glm::vec3(0.0f,1.0f,0.0f));
+//            rotationMatrix = glm::rotate(rotationMatrix, glm::radians(y), glm::vec3(1.0f,0.0f,0.0f));
+//            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+//        }
+
+//        update();
+    }
 }
 
 void MyOpenGL::onTimeout()
