@@ -10,7 +10,7 @@ MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
     m_rValue = 0.0f;
 
-    m_timer = new MMTimer(4, this);
+    m_timer = new MMTimer(10, this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
@@ -114,6 +114,9 @@ void MyOpenGL::init()
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    //transform();
+    coordTransform();
+
     m_timer->start();
 }
 
@@ -160,7 +163,7 @@ void MyOpenGL::transform()
 {
     static GLfloat angle = 0.0f;
 
-    angle += 0.01f;
+    angle += 1.0f;
     if( angle > 360.0f )
     {
         angle = 0.0f;
@@ -170,11 +173,45 @@ void MyOpenGL::transform()
     GLint rotateLocation = glGetUniformLocation(m_shaderProgram, "transform");
     if( rotateLocation != -1 )
     {
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f,0.0f,1.0f));
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(1.0f,0.0f,0.0f));
         glUniformMatrix4fv(rotateLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
 
         update();
     }
+}
+
+void MyOpenGL::coordTransform()
+{
+    glUseProgram(m_shaderProgram);
+
+    float screenWidth  = 800;
+    float screenHeight = 600;
+
+    // model
+    GLint modelLocation = glGetUniformLocation(m_shaderProgram, "model");
+    if( modelLocation != -1 )
+    {
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f,0.0f,0.0f));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    }
+
+    // view
+    GLint viewLocation = glGetUniformLocation(m_shaderProgram, "view");
+    if( viewLocation != -1 )
+    {
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+    }
+
+    // projection
+    GLint projectionLocation = glGetUniformLocation(m_shaderProgram, "projection");
+    if( projectionLocation != -1 )
+    {
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+    }
+
+    update();
 }
 
 void MyOpenGL::onTimeout()
@@ -194,5 +231,5 @@ void MyOpenGL::onTimeout()
 //        update();
 //    }
 
-    transform();
+    //transform();
 }

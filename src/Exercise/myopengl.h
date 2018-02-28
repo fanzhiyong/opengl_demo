@@ -30,6 +30,8 @@ private:
 
     void transform();
 
+    void coordTransform();
+
 private slots:
 
     void onTimeout();
