@@ -1,4 +1,4 @@
-# opengl_demo
+# OpenGL_demo
 基于Qt的OpenGL的练习工程。 
 ## 已实现的功能
 <br>
