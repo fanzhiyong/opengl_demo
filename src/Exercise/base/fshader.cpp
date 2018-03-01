@@ -1,16 +1,22 @@
 ﻿#include "fshader.h"
 #include <QDebug>
 #include <QFile>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-FShader::FShader(const QString &vertexShaderPath, const QString &fragmentShaderPath)
+FShader::FShader(QOpenGLWidget *widget, const QString &vertexShaderPath, const QString &fragmentShaderPath)
 {
     m_vertexShaderPath   = vertexShaderPath;
     m_fragmentShaderPath = fragmentShaderPath;
 
     m_shaderProgram = 0;
+
+    // init
+    init(widget);
 }
 
-bool FShader::init(QOpenGLWidget *widget)
+void FShader::init(QOpenGLWidget *widget)
 {
     attachOpenGLFunctions(widget);
 
@@ -18,13 +24,13 @@ bool FShader::init(QOpenGLWidget *widget)
     // vertex shader
     if( !createShader(vertexShader, GL_VERTEX_SHADER, getShaderSource(m_vertexShaderPath)) )
     {
-        return false;
+        return;
     }
 
     // fragment shader
     if( !createShader(fragmentShader, GL_FRAGMENT_SHADER, getShaderSource(m_fragmentShaderPath)) )
     {
-        return false;
+        return;
     }
 
     // link shader
@@ -35,11 +41,27 @@ bool FShader::init(QOpenGLWidget *widget)
     // clear
     core()->glDeleteShader(vertexShader);
     core()->glDeleteShader(fragmentShader);
+
+    // default model
+    transform();
 }
 
 void FShader::use()
 {
     core()->glUseProgram(m_shaderProgram);
+}
+
+void FShader::resize(int w, int h)
+{
+    use();
+
+    // projection
+    GLint projectionLocation = core()->glGetUniformLocation(m_shaderProgram, "projection");
+    if( projectionLocation != -1 )
+    {
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), w / (float)h, 0.1f, 100.0f);
+        core()->glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+    }
 }
 
 GLuint FShader::id()
@@ -66,7 +88,7 @@ bool FShader::checkShaderCompileStatus(GLuint id)
     if (!success)
     {
         core()->glGetShaderInfoLog(id, 512, NULL, infoLog);
-        qInfo()<<infoLog;
+        qWarning()<<infoLog;
         return false;
     }
     else
@@ -84,4 +106,25 @@ QString FShader::getShaderSource(const QString &fileName)
     }
 
     return "";
+}
+
+void FShader::transform()
+{
+    use();
+
+    // model
+    GLint modelLocation = core()->glGetUniformLocation(m_shaderProgram, "model");
+    if( modelLocation != -1 )
+    {
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f,0.0f,0.0f));
+        core()->glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    }
+
+    // view
+    GLint viewLocation = core()->glGetUniformLocation(m_shaderProgram, "view");
+    if( viewLocation != -1 )
+    {
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
+        core()->glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+    }
 }

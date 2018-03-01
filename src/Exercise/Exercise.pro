@@ -30,16 +30,16 @@ SOURCES += main.cpp\
         widget.cpp \
     myopengl.cpp \
     mmtimer.cpp \
-    openglcube.cpp \
     base/fshader.cpp \
-    base/fopenglfunctions.cpp
+    base/fopenglfunctions.cpp \
+    base/fcube.cpp
 
 HEADERS  += widget.h \
     myopengl.h \
     mmtimer.h \
-    openglcube.h \
     base/fshader.h \
-    base/fopenglfunctions.h
+    base/fopenglfunctions.h \
+    base/fcube.h
 
 FORMS    += widget.ui
 

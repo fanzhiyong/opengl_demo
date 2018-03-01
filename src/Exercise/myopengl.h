@@ -5,8 +5,8 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include "mmtimer.h"
-#include "openglcube.h"
 #include "base/fshader.h"
+#include "base/fcube.h"
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -22,8 +22,6 @@ public:
 
 private:
 
-    void coordTransform();
-
 private slots:
 
     void onTimeout();
@@ -31,6 +29,7 @@ private slots:
 private:
 
     FShader       * m_shader;
+    FCube         * m_cube;
 
     MMTimer       * m_timer;
 };

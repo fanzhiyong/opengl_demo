@@ -7,21 +7,25 @@
 class FShader : public FOpenGLFunctions
 {
 public:
-    FShader(const QString & vertexShaderPath = "", const QString & fragmentShaderPath = "");
-
-    bool init(QOpenGLWidget * widget);
+    FShader(QOpenGLWidget * widget, const QString & vertexShaderPath = "", const QString & fragmentShaderPath = "");
 
     void use();
+
+    void resize(int w, int h);
 
     GLuint id();
 
 private:
+
+    void init(QOpenGLWidget * widget);
 
     bool createShader(GLuint & id, int shaderType, const QString & shaderSource);
 
     bool checkShaderCompileStatus(GLuint id);
 
     QString getShaderSource(const QString &fileName);
+
+    void transform();
 
 private:
 
