@@ -5,6 +5,8 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include "mmtimer.h"
+#include "openglcube.h"
+#include "base/fshader.h"
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -20,23 +22,7 @@ public:
 
 private:
 
-    void init();
-
-    QString getShaderSource(const QString & fileName);
-
-    bool checkShaderCompileStatus(GLuint id);
-
-    bool createShader(GLuint & id, int shaderType, const QString & shaderSource);
-
-    void transform();
-
     void coordTransform();
-
-    void mousePressEvent(QMouseEvent * event);
-
-    void mouseReleaseEvent(QMouseEvent * event);
-
-    void mouseMoveEvent(QMouseEvent * event);
 
 private slots:
 
@@ -44,19 +30,9 @@ private slots:
 
 private:
 
-    bool        m_pressed;
-    QPoint      m_pressPoint;
-    float       m_x;
+    FShader       * m_shader;
 
-    GLuint      m_shaderProgram;
-    GLuint      m_vao;
-    GLuint      m_vbo;
-
-    GLuint      m_texture;
-
-    MMTimer   * m_timer;
-
-    float       m_rValue;
+    MMTimer       * m_timer;
 };
 
 #endif // MYOPENGL_H

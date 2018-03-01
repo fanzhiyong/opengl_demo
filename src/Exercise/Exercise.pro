@@ -29,11 +29,17 @@ LIBS += -lwinmm
 SOURCES += main.cpp\
         widget.cpp \
     myopengl.cpp \
-    mmtimer.cpp
+    mmtimer.cpp \
+    openglcube.cpp \
+    base/fshader.cpp \
+    base/fopenglfunctions.cpp
 
 HEADERS  += widget.h \
     myopengl.h \
-    mmtimer.h
+    mmtimer.h \
+    openglcube.h \
+    base/fshader.h \
+    base/fopenglfunctions.h
 
 FORMS    += widget.ui
 

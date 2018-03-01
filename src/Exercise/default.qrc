@@ -3,5 +3,6 @@
         <file>res/fragmentShader.txt</file>
         <file>res/vertexShader.txt</file>
         <file>res/timg.jpg</file>
+        <file>res/style.qss</file>
     </qresource>
 </RCC>

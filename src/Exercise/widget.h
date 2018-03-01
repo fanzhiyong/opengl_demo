@@ -8,6 +8,8 @@ namespace Ui {
 class Widget;
 }
 
+class QLabel;
+
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -19,9 +21,13 @@ public:
 
 private:
 
+    void setQss();
+
+private:
+
     Ui::Widget *ui;
 
-    MyOpenGL * m_openGL;
+    MyOpenGL  * m_openGL;
 };
 
 #endif // WIDGET_H
