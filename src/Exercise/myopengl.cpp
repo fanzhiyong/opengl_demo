@@ -9,8 +9,9 @@
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
-    m_shader = NULL;
-    m_cube   = NULL;
+    m_shader    = NULL;
+    m_cube      = NULL;
+    m_lightCube = NULL;
 
     m_timer = new MMTimer(20, this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
@@ -21,9 +22,12 @@ void MyOpenGL::initializeGL()
     initializeOpenGLFunctions();
 
     // shader
-    m_shader = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShader.txt");
+    m_shader      = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShader.txt");
+    m_shaderLight = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShaderForLight.txt");
+
     // cube
-    m_cube   = new FCube(this);
+    m_cube      = new FCube(this);
+    m_lightCube = new FCube(this);
 
     // openGL
     glEnable(GL_DEPTH_TEST);
@@ -38,6 +42,7 @@ void MyOpenGL::paintGL()
 
     // do something
     m_cube->draw(m_shader->id(), -1.0f, -1.0f, -1.0f);
+    m_lightCube->draw(m_shaderLight->id(), 4.0f, 4.0f, -8.0f);
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -46,6 +51,7 @@ void MyOpenGL::resizeGL(int w, int h)
 
     glViewport(0, 0, w, h);
     m_shader->resize(w, h);
+    m_shaderLight->resize(w, h);
 }
 
 void MyOpenGL::onTimeout()

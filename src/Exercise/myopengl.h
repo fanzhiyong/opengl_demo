@@ -29,7 +29,10 @@ private slots:
 private:
 
     FShader       * m_shader;
+    FShader       * m_shaderLight;
+
     FCube         * m_cube;
+    FCube         * m_lightCube;
 
     MMTimer       * m_timer;
 };
