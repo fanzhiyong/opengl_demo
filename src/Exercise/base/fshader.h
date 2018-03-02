@@ -3,6 +3,9 @@
 
 #include <QString>
 #include "fopenglfunctions.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class FShader : public FOpenGLFunctions
 {
@@ -14,6 +17,8 @@ public:
     void resize(int w, int h);
 
     GLuint id();
+
+    void setValue(const QString & name, glm::mat4 value);
 
 private:
 

@@ -1,9 +1,6 @@
 ﻿#include "fshader.h"
 #include <QDebug>
 #include <QFile>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 FShader::FShader(QOpenGLWidget *widget, const QString &vertexShaderPath, const QString &fragmentShaderPath)
 {
@@ -34,13 +31,13 @@ void FShader::init(QOpenGLWidget *widget)
     }
 
     // link shader
-    m_shaderProgram = core()->glCreateProgram();
-    core()->glAttachShader(m_shaderProgram, vertexShader);
-    core()->glAttachShader(m_shaderProgram, fragmentShader);
-    core()->glLinkProgram(m_shaderProgram);
+    m_shaderProgram = glCreateProgram();
+    glAttachShader(m_shaderProgram, vertexShader);
+    glAttachShader(m_shaderProgram, fragmentShader);
+    glLinkProgram(m_shaderProgram);
     // clear
-    core()->glDeleteShader(vertexShader);
-    core()->glDeleteShader(fragmentShader);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
     // default model
     transform();
@@ -48,7 +45,7 @@ void FShader::init(QOpenGLWidget *widget)
 
 void FShader::use()
 {
-    core()->glUseProgram(m_shaderProgram);
+    glUseProgram(m_shaderProgram);
 }
 
 void FShader::resize(int w, int h)
@@ -56,12 +53,8 @@ void FShader::resize(int w, int h)
     use();
 
     // projection
-    GLint projectionLocation = core()->glGetUniformLocation(m_shaderProgram, "projection");
-    if( projectionLocation != -1 )
-    {
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), w / (float)h, 0.1f, 100.0f);
-        core()->glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-    }
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), w / (float)h, 0.1f, 100.0f);
+    setValue("projection", projection);
 }
 
 GLuint FShader::id()
@@ -69,13 +62,28 @@ GLuint FShader::id()
     return m_shaderProgram;
 }
 
+void FShader::setValue(const QString &name, glm::mat4 value)
+{
+    use();
+
+    GLint location = glGetUniformLocation(m_shaderProgram, name.toStdString().c_str());
+    if( location != -1 )
+    {
+        glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    }
+    else
+    {
+        qWarning()<<"no has "<<name<<" value";
+    }
+}
+
 bool FShader::createShader(GLuint & id, int shaderType, const QString & shaderSource)
 {
     std::string strShaderSource = shaderSource.toStdString();
     const char * source = strShaderSource.c_str();
-    id = core()->glCreateShader(shaderType);
-    core()->glShaderSource(id, 1, &source, NULL);
-    core()->glCompileShader(id);
+    id = glCreateShader(shaderType);
+    glShaderSource(id, 1, &source, NULL);
+    glCompileShader(id);
 
     return checkShaderCompileStatus(id);
 }
@@ -84,10 +92,10 @@ bool FShader::checkShaderCompileStatus(GLuint id)
 {
     int  success;
     char infoLog[512] = {0};
-    core()->glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(id, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        core()->glGetShaderInfoLog(id, 512, NULL, infoLog);
+        glGetShaderInfoLog(id, 512, NULL, infoLog);
         qWarning()<<infoLog;
         return false;
     }
@@ -113,18 +121,10 @@ void FShader::transform()
     use();
 
     // model
-    GLint modelLocation = core()->glGetUniformLocation(m_shaderProgram, "model");
-    if( modelLocation != -1 )
-    {
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f,0.0f,0.0f));
-        core()->glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
-    }
+    glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f,0.0f,0.0f));
+    setValue("model", model);
 
     // view
-    GLint viewLocation = core()->glGetUniformLocation(m_shaderProgram, "view");
-    if( viewLocation != -1 )
-    {
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
-        core()->glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-    }
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
+    setValue("view", view);
 }

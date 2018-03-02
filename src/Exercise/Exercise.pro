@@ -26,20 +26,26 @@ INCLUDEPATH += ..\..\include
 
 LIBS += -lwinmm
 
+LIBS += ..\..\lib\assimp\debug\assimp-vc140-mt.lib
+
 SOURCES += main.cpp\
         widget.cpp \
     myopengl.cpp \
     mmtimer.cpp \
     base/fshader.cpp \
     base/fopenglfunctions.cpp \
-    base/fcube.cpp
+    base/fcube.cpp \
+    base/fmesh.cpp \
+    base/fglobal.cpp
 
 HEADERS  += widget.h \
     myopengl.h \
     mmtimer.h \
     base/fshader.h \
     base/fopenglfunctions.h \
-    base/fcube.h
+    base/fcube.h \
+    base/fmesh.h \
+    base/fglobal.h
 
 FORMS    += widget.ui
 

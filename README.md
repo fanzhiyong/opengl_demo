@@ -1,5 +1,5 @@
 # OpenGL_demo
-基于Qt的OpenGL的练习工程。 
+基于Qt的OpenGL的练习工程。 原教程地址：https://learnopengl-cn.github.io
 ## 入门
 <br>
 1. 纹理的显示。<br>SHA: f284fb72d60f58547194dce81899c478a0ebb1de<br><br>
