@@ -7,6 +7,7 @@
 #include "mmtimer.h"
 #include "base/fshader.h"
 #include "base/fcube.h"
+#include "base/fmodel.h"
 
 class MyOpenGL : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -28,11 +29,12 @@ private slots:
 
 private:
 
-    FShader       * m_shader;
-    FShader       * m_shaderLight;
+    FShader  * m_shader;
+    FModel   * m_model;
 
-    FCube         * m_cube;
-    FCube         * m_lightCube;
+//    FShader       * m_shaderLight;
+//    FCube         * m_cube;
+//    FCube         * m_lightCube;
 
     MMTimer       * m_timer;
 };

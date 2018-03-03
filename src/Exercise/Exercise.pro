@@ -26,7 +26,7 @@ INCLUDEPATH += ..\..\include
 
 LIBS += -lwinmm
 
-LIBS += ..\..\lib\assimp\debug\assimp-vc140-mt.lib
+LIBS += E:\my_projects\opengl_demo\lib\assimp\debug\assimp-vc140-mt.lib
 
 SOURCES += main.cpp\
         widget.cpp \
@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     base/fopenglfunctions.cpp \
     base/fcube.cpp \
     base/fmesh.cpp \
-    base/fglobal.cpp
+    base/fglobal.cpp \
+    base/fmodel.cpp
 
 HEADERS  += widget.h \
     myopengl.h \
@@ -45,7 +46,8 @@ HEADERS  += widget.h \
     base/fopenglfunctions.h \
     base/fcube.h \
     base/fmesh.h \
-    base/fglobal.h
+    base/fglobal.h \
+    base/fmodel.h
 
 FORMS    += widget.ui
 

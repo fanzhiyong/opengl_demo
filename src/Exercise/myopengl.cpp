@@ -9,11 +9,9 @@
 
 MyOpenGL::MyOpenGL(QWidget *parent) : QOpenGLWidget(parent)
 {
-    m_shader    = NULL;
-    m_cube      = NULL;
-    m_lightCube = NULL;
-
-    m_timer = new MMTimer(20, this);
+    m_shader = NULL;
+    m_model  = NULL;
+    m_timer  = new MMTimer(20, this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
@@ -22,12 +20,9 @@ void MyOpenGL::initializeGL()
     initializeOpenGLFunctions();
 
     // shader
-    m_shader      = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShader.txt");
-    m_shaderLight = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShaderForLight.txt");
-
-    // cube
-    m_cube      = new FCube(this);
-    m_lightCube = new FCube(this);
+    m_shader = new FShader(this, ":/res/vertexShader.txt", ":/res/fragmentShader.txt");
+    m_model  = new FModel(this);
+    m_model->load("");
 
     // openGL
     glEnable(GL_DEPTH_TEST);
@@ -41,8 +36,7 @@ void MyOpenGL::paintGL()
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // do something
-    m_cube->draw(m_shader->id(), -1.0f, -1.0f, -1.0f);
-    m_lightCube->draw(m_shaderLight->id(), 4.0f, 4.0f, -8.0f);
+    m_model->draw(m_shader);
 }
 
 void MyOpenGL::resizeGL(int w, int h)
@@ -51,7 +45,6 @@ void MyOpenGL::resizeGL(int w, int h)
 
     glViewport(0, 0, w, h);
     m_shader->resize(w, h);
-    m_shaderLight->resize(w, h);
 }
 
 void MyOpenGL::onTimeout()

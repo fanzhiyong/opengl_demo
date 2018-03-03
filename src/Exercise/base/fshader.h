@@ -19,6 +19,8 @@ public:
     GLuint id();
 
     void setValue(const QString & name, glm::mat4 value);
+    void setValue(const QString & name, int value);
+    void setValue(const QString & name, float value);
 
 private:
 

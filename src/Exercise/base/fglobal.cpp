@@ -1,6 +1,2 @@
-#include "fglobal.h"
+﻿#include "fglobal.h"
 
-FGlobal::FGlobal()
-{
-
-}

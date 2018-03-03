@@ -20,15 +20,22 @@ struct FVertex
     glm::vec3 texCoords;    // 纹理坐标
 };
 
+enum FTextureType
+{
+    FDiffuseTexture,    // 漫反射
+    FSpecularTexture    // 镜面反射
+};
+
 struct FTexture
 {
     FTexture()
     {
-        id = 0;
+        id   = 0;
+        type = FDiffuseTexture;
     }
 
     unsigned int id;
-    QString      type;
+    FTextureType type;
 };
 
 

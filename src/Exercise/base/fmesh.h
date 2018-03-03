@@ -5,19 +5,24 @@
 #include "fglobal.h"
 #include <QVector>
 
+class FShader;
+class aiMesh;
+
 class FMesh : public FOpenGLFunctions
 {
 public:
 
     FMesh(QOpenGLWidget * widget);
 
-    bool load(const QString & path);
+    void parse(aiMesh * mesh);
 
-    void draw(GLuint programShader);
+    void draw(FShader * shader);
 
 private:
 
     void setupMesh();
+
+    void bindTexture(FShader * shader, int & pos, FTextureType type);
 
 private:
 

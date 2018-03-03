@@ -77,6 +77,36 @@ void FShader::setValue(const QString &name, glm::mat4 value)
     }
 }
 
+void FShader::setValue(const QString &name, int value)
+{
+    use();
+
+    GLint location = glGetUniformLocation(m_shaderProgram, name.toStdString().c_str());
+    if( location != -1 )
+    {
+        glUniform1i(location, value);
+    }
+    else
+    {
+        qWarning()<<"no has "<<name<<" value";
+    }
+}
+
+void FShader::setValue(const QString &name, float value)
+{
+    use();
+
+    GLint location = glGetUniformLocation(m_shaderProgram, name.toStdString().c_str());
+    if( location != -1 )
+    {
+        glUniform1f(location, value);
+    }
+    else
+    {
+        qWarning()<<"no has "<<name<<" value";
+    }
+}
+
 bool FShader::createShader(GLuint & id, int shaderType, const QString & shaderSource)
 {
     std::string strShaderSource = shaderSource.toStdString();

@@ -26,13 +26,25 @@ public:
     void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
     void glEnableVertexAttribArray(GLuint index);
     GLint glGetUniformLocation(GLuint program, const GLchar *name);
+    void glBindTexture(GLenum target, GLuint texture);
+
     void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+    //void glUniform1iv(GLint location, GLsizei count, const GLint *value);
+    void glUniform1i(GLint location, GLint v0);
+    void glUniform1f(GLint location, GLfloat v0);
+
     GLuint glCreateShader(GLenum type);
     void glShaderSource(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length);
     void glCompileShader(GLuint shader);
     void glGetShaderiv(GLuint shader, GLenum pname, GLint *params);
     void glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
     void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+    void glActiveTexture(GLenum texture);
+    void glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
+
+protected:
+
+    QOpenGLWidget * m_openGLWidget;
 
 private:
 

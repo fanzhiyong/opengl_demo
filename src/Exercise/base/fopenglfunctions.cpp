@@ -5,11 +5,13 @@
 FOpenGLFunctions::FOpenGLFunctions(QOpenGLFunctions_3_3_Core * core)
 {
     m_core = core;
+    m_openGLWidget = NULL;
 }
 
 void FOpenGLFunctions::attachOpenGLFunctions(QOpenGLWidget *widget)
 {
     m_core = widget->context()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+    m_openGLWidget = widget;
 }
 
 QOpenGLFunctions_3_3_Core *FOpenGLFunctions::core()
@@ -92,9 +94,24 @@ GLint FOpenGLFunctions::glGetUniformLocation(GLuint program, const GLchar *name)
     return core()->glGetUniformLocation(program, name);
 }
 
+void FOpenGLFunctions::glBindTexture(GLenum target, GLuint texture)
+{
+    core()->glBindTexture(target, texture);
+}
+
 void FOpenGLFunctions::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
 {
     core()->glUniformMatrix4fv(location, count, transpose, value);
+}
+
+void FOpenGLFunctions::glUniform1i(GLint location, GLint v0)
+{
+    core()->glUniform1i(location, v0);
+}
+
+void FOpenGLFunctions::glUniform1f(GLint location, GLfloat v0)
+{
+    core()->glUniform1f(location, v0);
 }
 
 GLuint FOpenGLFunctions::glCreateShader(GLenum type)
@@ -125,4 +142,14 @@ void FOpenGLFunctions::glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsi
 void FOpenGLFunctions::glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
 {
     core()->glGetShaderInfoLog(shader, bufSize, length, infoLog);
+}
+
+void FOpenGLFunctions::glActiveTexture(GLenum texture)
+{
+    core()->glActiveTexture(texture);
+}
+
+void FOpenGLFunctions::glDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)
+{
+    core()->glDrawElements(mode, count, type, indices);
 }
